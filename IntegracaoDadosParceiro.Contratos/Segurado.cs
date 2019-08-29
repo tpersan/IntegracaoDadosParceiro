@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 namespace IntegracaoDadosParceiro.Contratos.Exportacao
 {
+
     public class Segurado
     {
         private long Id { get; set; }

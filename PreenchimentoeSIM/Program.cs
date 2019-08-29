@@ -1,6 +1,9 @@
 ﻿using IntegracaoDadosParceiro.Base;
+using IntegracaoDadosParceiro.Base.Extensao;
+using IntegracaoDadosParceiro.Contratos.BaseIntegracao;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using PreenchimentoeSIM.Atualizacao;
 using PreenchimentoeSIM.Consulta;
 using System;
 using System.Collections.Generic;
@@ -16,41 +19,53 @@ namespace PreenchimentoeSIM
         static void Main(string[] args)
         {
 
-            var pessoas = ObterPessoasDoB2B();
+            LogConsole.Mensagem("Iniciando a Etapa 1 - Obtendo Clientes do B2B");
+            var clientes = ClientesB2B.Obter().ToList();
 
+            LogConsole.Mensagem("Iniciando a Etapa 2 - Carga de Clientes na base de Integracao");
 
-            //if (args?.Count <= 0)
-            //    throw new InvalidOperationException("Deve possuir o parametro CPF");
-
-            //var cpf = args[0];
-
-            //LogConsole.Mensagem("CPF: ");
-            //var cpfDigitado = Console.ReadLine();
-
-            //if (string.IsNullOrWhiteSpace(cpfDigitado))
-            //    throw new InvalidOperationException("CPF Vazio!");
-
-            //var cpf = Convert.ToInt64(cpfDigitado);
-            long cpf = 90715470272;
-
-            if (cpf <= 0)
-                throw new InvalidOperationException("CPF Mals!");
-
-            var segurado = ClienteB2B.Obter(cpf);
-
-            if (segurado != null)
+            Parallel.ForEach(clientes, new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount * 4 }, doCliente =>
             {
-                LogConsole.Mensagem("Resultado:");
-
-                LogConsole.Mensagem(JsonConvert.SerializeObject(segurado, Formatting.Indented, settings: new JsonSerializerSettings
+                try
                 {
-                    DateFormatString = "dd/MM/yyyy",
-                    NullValueHandling = NullValueHandling.Ignore,
-                }));
-            }
+                    ClientesIntegracao.CriarCliente(doCliente);
+                    var json = ObterDadosDoCliente(doCliente.Documento);
+                    DadosClientesIntegracao.CriarDadosCliente(DeParaDadosCliente(doCliente, json));
+                }
+                catch (Exception e)
+                {
+                    LogConsole.Erro($"Cliente: {doCliente.Documento} - {e.Message} - {e.StackTrace}");
+                }
+
+            });
+
+            LogConsole.Mensagem("Iniciando a Etapa 1 - Carga de Clientes do B2B");
 
             Console.ReadKey();
 
+        }
+
+        private static DadosCliente DeParaDadosCliente(Cliente doCliente, string json)
+        {
+            return new DadosCliente
+            {
+                DadosDisponiveis = json,
+                Documento = doCliente.Documento
+            };
+        }
+
+        private static string ObterDadosDoCliente(long cpf)
+        {
+            var segurado = DadosClientesB2B.Obter(cpf);
+
+            if (segurado == null)
+                throw new Exception("Cliente não encontrado no B2B");
+
+            return JsonConvert.SerializeObject(segurado, Formatting.Indented, settings: new JsonSerializerSettings
+            {
+                DateFormatString = "dd/MM/yyyy",
+                NullValueHandling = NullValueHandling.Ignore,
+            });
         }
     }
 }

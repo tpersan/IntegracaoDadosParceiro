@@ -1,14 +1,12 @@
 ﻿using Dapper;
 using IntegracaoDadosParceiro.Contratos.Exportacao;
-using System;
-using System.Collections.Generic;
 using System.Configuration;
 using System.Data.SqlClient;
 using System.Linq;
 
 namespace PreenchimentoeSIM.Consulta
 {
-    internal static class ClienteB2B
+    internal static class DadosClientesB2B
     {
         internal static Segurado Obter(long cpf)
         {

@@ -1,4 +1,6 @@
 ﻿
+using IntegracaoDadosParceiro.Contratos.BaseIntegracao;
+
 namespace IntegracaoDadosParceiro.Contratos.Exportacao
 {
 
