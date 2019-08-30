@@ -22,9 +22,10 @@ namespace PreenchimentoeSIM.Consulta
         }
 
         private const string COMANDO = @"
-            SELECT DISTINCT
-	            Segurado.Documento, 
-	            Segurado.Nome 
+            SELECT DISTINCT 
+--                TOP 50000
+	                Segurado.Documento, 
+	                Segurado.Nome 
             FROM PESSOA Segurado
             	INNER JOIN Inscricao I ON I.Segurado_PessoaId = Segurado.Id
             WHERE Segurado.TipoDocumento = 'CPF' ";

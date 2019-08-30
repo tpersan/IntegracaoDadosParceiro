@@ -15,12 +15,13 @@ namespace PreenchimentoeSIM.Atualizacao
             using (var connection = new SqlConnection(ConfigurationManager.ConnectionStrings["IntegracaoParceiro"].ToString()))
             {
                 connection.Execute(
-                    COMANDO,
-                    new { documento = cliente.Documento, nome = cliente.Nome, cnpj = cliente.Cnpj },
+                    "PInserirCliente",
+                    new { cliente.Documento, cliente.Nome, cliente.Cnpj },
+                    //new { documento = cliente.Documento, nome = cliente.Nome, cnpj = cliente.Cnpj },
                     commandType: CommandType.StoredProcedure);
             }
         }
 
-        private const string COMANDO = @"PInserirCliente @documento @nome @cnpj";
+        private const string COMANDO = @"EXEC PInserirCliente @documento, @nome, @cnpj";
     }
 }

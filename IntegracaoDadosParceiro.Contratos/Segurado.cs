@@ -12,8 +12,8 @@ namespace IntegracaoDadosParceiro.Contratos.Exportacao
         public string Nome { get; set; }
         public string Sexo { get; set; }
         public string EstadoCivil { get; set; }
-        public Profissao Profissao { get; set; }
-
+        public string Cbo { get; set; }
+        public string Profissao { get; set; }
         private List<string> _email { get; set; }
         public List<string> Email
         {
@@ -24,7 +24,7 @@ namespace IntegracaoDadosParceiro.Contratos.Exportacao
         private List<Endereco> _endereco;
         public List<Endereco> Endereco
         {
-            get { return _endereco ?? (_endereco  = new List<Endereco>()); }
+            get { return _endereco ?? (_endereco = new List<Endereco>()); }
             set { _endereco = value; }
         }
 

@@ -25,6 +25,7 @@ namespace PreenchimentoeSIM
             LogConsole.Mensagem("Iniciando a Etapa 2 - Carga de Clientes na base de Integracao");
 
             Parallel.ForEach(clientes, new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount * 4 }, doCliente =>
+            //foreach (var doCliente in clientes)
             {
                 try
                 {
@@ -34,7 +35,7 @@ namespace PreenchimentoeSIM
                 }
                 catch (Exception e)
                 {
-                    LogConsole.Erro($"Cliente: {doCliente.Documento} - {e.Message} - {e.StackTrace}");
+                    LogConsole.Erro($"Cliente: {doCliente.Documento} - {e.Message}");
                 }
 
             });

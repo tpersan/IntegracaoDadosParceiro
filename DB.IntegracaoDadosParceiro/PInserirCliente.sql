@@ -13,7 +13,7 @@ AS
 	  AND C.DOCUMENTOORIGEM = @cnpj;
 
 	IF (ISNULL(@existe, 0) = 0)
-    BEGIN
+    BEGIN	
 	   INSERT INTO CLIENTES (DOCUMENTO, DOCUMENTOORIGEM, NOME)
 	   VALUES (@documento, @cnpj, @nome)
 	END;

@@ -13,21 +13,21 @@ namespace PreenchimentoeSIM.Atualizacao
             using (var connection = new SqlConnection(ConfigurationManager.ConnectionStrings["IntegracaoParceiro"].ToString()))
             {
                 connection.Execute(
-                    sql: COMANDO,
+                    sql: "PInserirDadosCliente ",
                     param: new {
-                        documento = cliente.Documento,
-                        documentoOrigem = cliente.DocumentoOrigem,
-                        sistemaOrigem = cliente.SistemaOrigem,
-                        dados = cliente.DadosDisponiveis
+                        cliente.Documento,
+                        cliente.DocumentoOrigem,
+                        cliente.SistemaOrigem,
+                        cliente.DadosDisponiveis
                     },
                     commandType: CommandType.StoredProcedure);
             }
         }
 
         private const string COMANDO = @"PInserirDadosCliente 
-                                            @documento 
-                                            @documentoOrigem 
-                                            @sistemaOrigem 
+                                            @documento, 
+                                            @documentoOrigem,
+                                            @sistemaOrigem,
                                             @dados ";
     }
 }
