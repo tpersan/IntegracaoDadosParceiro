@@ -21,20 +21,21 @@ namespace PreenchimentoeSIM
             var totalAtual = 500000;
 
             var pagina = 1;
-            var itens = 1000;
+            var itens = 300;
 
             while ((pagina * itens) <= totalAtual)
             {
-                LogConsole.Mensagem($"{DateTime.Now} - Iniciando a Etapa 1 - Obtendo Clientes do B2B - Página {pagina}");
-                var clientes = ClientesB2B.Obter(pagina, itens).ToList();
+                LogConsole.Mensagem($"{DateTime.Now} - Etapa 1 - Obtendo Clientes do B2B - Página {pagina}");
+                var clientesDoB2b = ClientesB2B.Obter(pagina, itens).ToList();
 
-                LogConsole.Mensagem($"Iniciando a Etapa 2 - Carga de Clientes na base de Integracao - Página: {pagina} - Itens: {clientes.Count()}");
+                LogConsole.Mensagem($"{DateTime.Now} - Etapa 2 - Obtendo clientes que ainda não foram migrados");
+                var clientesMigrados = ClientesIntegracao.EstahLah(clientesDoB2b.Select(c => c.Documento).ToList());
+
+                var clientes = clientesDoB2b.Where(c => !clientesMigrados.Any(cm => cm == c.Documento));
+                LogConsole.Mensagem($"{DateTime.Now} - Etapa 3 - Carga de Clientes na base de Integracao - Página: {pagina} - Itens: {clientes.Count()}");
 
                 foreach (var doCliente in clientes)
                 {
-                    if (ClientesIntegracao.EstahLah(doCliente.Documento))
-                        continue;
-
                     try
                     {
                         ClientesIntegracao.CriarCliente(doCliente);
@@ -48,8 +49,8 @@ namespace PreenchimentoeSIM
 
                 }
 
-                LogConsole.Aviso($"Feitos {(pagina * itens)} de {totalAtual}");
-                
+                LogConsole.Aviso($"{DateTime.Now} - RESULTADO - Feitos {(pagina * itens)} de {totalAtual}");
+
 
                 pagina++;
 
