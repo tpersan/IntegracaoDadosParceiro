@@ -18,29 +18,44 @@ namespace PreenchimentoeSIM
 
         static void Main(string[] args)
         {
+            var totalAtual = 500000;
 
-            LogConsole.Mensagem("Iniciando a Etapa 1 - Obtendo Clientes do B2B");
-            var clientes = ClientesB2B.Obter().ToList();
+            var pagina = 1;
+            var itens = 1000;
 
-            LogConsole.Mensagem("Iniciando a Etapa 2 - Carga de Clientes na base de Integracao");
-
-            Parallel.ForEach(clientes, new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount * 4 }, doCliente =>
-            //foreach (var doCliente in clientes)
+            while ((pagina * itens) <= totalAtual)
             {
-                try
+                LogConsole.Mensagem($"{DateTime.Now} - Iniciando a Etapa 1 - Obtendo Clientes do B2B - Página {pagina}");
+                var clientes = ClientesB2B.Obter(pagina, itens).ToList();
+
+                LogConsole.Mensagem($"Iniciando a Etapa 2 - Carga de Clientes na base de Integracao - Página: {pagina} - Itens: {clientes.Count()}");
+
+                foreach (var doCliente in clientes)
                 {
-                    ClientesIntegracao.CriarCliente(doCliente);
-                    var json = ObterDadosDoCliente(doCliente.Documento);
-                    DadosClientesIntegracao.CriarDadosCliente(DeParaDadosCliente(doCliente, json));
-                }
-                catch (Exception e)
-                {
-                    LogConsole.Erro($"Cliente: {doCliente.Documento} - {e.Message}");
+                    if (ClientesIntegracao.EstahLah(doCliente.Documento))
+                        continue;
+
+                    try
+                    {
+                        ClientesIntegracao.CriarCliente(doCliente);
+                        var json = ObterDadosDoCliente(doCliente.Documento);
+                        DadosClientesIntegracao.CriarDadosCliente(DeParaDadosCliente(doCliente, json));
+                    }
+                    catch (Exception e)
+                    {
+                        LogConsole.Erro($"Cliente: {doCliente.Documento} - {e.Message}");
+                    }
+
                 }
 
-            });
+                LogConsole.Aviso($"Feitos {(pagina * itens)} de {totalAtual}");
+                
 
-            LogConsole.Mensagem("Iniciando a Etapa 1 - Carga de Clientes do B2B");
+                pagina++;
+
+                LogConsole.Mensagem("-------------------");
+            }
+
 
             Console.ReadKey();
 

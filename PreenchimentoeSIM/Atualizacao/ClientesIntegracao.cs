@@ -10,6 +10,19 @@ namespace PreenchimentoeSIM.Atualizacao
 {
     public static class ClientesIntegracao
     {
+        internal static bool EstahLah(long cpf)
+        {
+            var clienteEnviado = 0;
+            using (var connection = new SqlConnection(ConfigurationManager.ConnectionStrings["IntegracaoParceiro"].ToString()))
+            {
+                clienteEnviado = connection.QueryFirst<int>(
+                    CONSULTA,
+                    new { @cpf = cpf });
+            }
+
+            return clienteEnviado > 0;
+        }
+
         internal static void CriarCliente(Cliente cliente)
         {
             using (var connection = new SqlConnection(ConfigurationManager.ConnectionStrings["IntegracaoParceiro"].ToString()))
@@ -23,5 +36,11 @@ namespace PreenchimentoeSIM.Atualizacao
         }
 
         private const string COMANDO = @"EXEC PInserirCliente @documento, @nome, @cnpj";
+
+        private const string CONSULTA = @"
+            SELECT TOP (1) 1
+            FROM Clientes c
+               INNER JOIN DadosClientes dc ON c.documento = dc.documento
+            WHERE c.documento = @cpf ";
     }
 }
